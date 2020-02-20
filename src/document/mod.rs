@@ -63,7 +63,7 @@ impl Document {
     }
 } //}}}
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 struct Matcher {
     //{{{
     tag: Vec<String>,
@@ -160,10 +160,10 @@ fn get_attr(attrs: &Ref<'_, Vec<Attribute>>, name: &str) -> Option<String> {
 }
 
 impl Selector {
-    fn find_nodes(&self, elements: Vec<Handle>) -> Vec<Handle> {
+    fn find_nodes(&self, matchers: Vec<Matcher>, elements: Vec<Handle>) -> Vec<Handle> {
         let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
 
-        self.matchers.iter().fold(elements, |elements, matcher| {
+        matchers.iter().fold(elements, |elements, matcher| {
             let mut acc = vec![];
 
             for el in elements.iter() {
@@ -175,11 +175,23 @@ impl Selector {
                     } if matcher.matches(name, attrs.borrow()) => {
                         acc.push(Rc::clone(&el));
                     }
-                    _ => acc.append(
-                        &mut self.find_nodes(el.children.borrow().iter().map(Rc::clone).collect()),
-                    ),
+                    _ => {
+                        acc.append(&mut self.find_nodes(
+                            matchers.clone(),
+                            el.children.borrow().iter().map(Rc::clone).collect(),
+                        ));
+                        acc.append(&mut self.find_nodes(
+                            matchers[1..].to_vec(),
+                            el.children.borrow().iter().map(Rc::clone).collect(),
+                        ));
+                    }
                 };
             }
+
+            println!(
+                "elemens at the ent of selection for {:?} \n {:?}",
+                matcher, acc
+            );
 
             acc
         })
@@ -187,8 +199,9 @@ impl Selector {
 
     fn find(&self, elements: Ref<'_, Vec<Handle>>) -> Vec<Element> {
         let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
+        println!("matchers: {:?}", self.matchers);
 
-        self.find_nodes(elements)
+        self.find_nodes(self.matchers.clone(), elements)
             .iter()
             .map(|e| Element {
                 handle: Rc::clone(e),
@@ -330,6 +343,26 @@ mod tests {
     fn test_el_attr_double_class_reverse_order() {
         let doc = Document::from("<a class='link button' id='linkmain'>hi there</a>");
         let sel = doc.select("a.button.link");
+        let el = sel.first().unwrap();
+        assert_eq!(el.attr("id"), Some("linkmain".to_string()));
+    }
+
+    #[test]
+    fn test_el_nested_selection() {
+        let doc = Document::from(
+            "<div class='container'><a class='link button' id='linkmain'>hi there</a></div>",
+        );
+        let sel = doc.select("div.container a.button.link");
+        let el = sel.first().unwrap();
+        assert_eq!(el.attr("id"), Some("linkmain".to_string()));
+    }
+
+    #[test]
+    fn test_el_nested_selection_with_el_in_between() {
+        let doc = Document::from(
+            "<div class='container'><span>text</span><a class='link button' id='linkmain'>hi there</a></div>",
+        );
+        let sel = doc.select("div.container a.button.link");
         let el = sel.first().unwrap();
         assert_eq!(el.attr("id"), Some("linkmain".to_string()));
     }
