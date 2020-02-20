@@ -1,0 +1,16 @@
+[package]
+name = "rquery"
+version = "0.1.0"
+authors = ["Max Gonzih <gonzih@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+scraper = "0.11.0"
+html5ever = "0.25.1"
+markup5ever = "0.10.0"
+markup5ever_rcdom = "0.1.0"
+reqwest = { version = "0.10", features = [] }
+tokio = { version = "0.2", features = ["full"] }
+clap = { git = "https://github.com/clap-rs/clap" }
+futures = "0.3.4"
