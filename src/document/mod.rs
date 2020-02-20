@@ -111,6 +111,28 @@ impl From<&str> for Matcher {
         res
     }
 }
+
+impl Matcher {
+    fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
+        let mut id_match = true;
+        if let Some(el_id) = get_attr(&attrs, "id") {
+            let el_ids: Vec<_> = el_id.split_whitespace().collect();
+            id_match = self.id.iter().all(|id| el_ids.iter().any(|eid| eid == id))
+        }
+
+        let mut class_match = true;
+        if let Some(el_class) = get_attr(&attrs, "class") {
+            let el_classes: Vec<_> = el_class.split_whitespace().collect();
+
+            class_match = self
+                .class
+                .iter()
+                .all(|class| el_classes.iter().any(|eclass| eclass == class))
+        }
+
+        self.tag.iter().any(|tag| &name.local.to_string() == tag) && id_match && class_match
+    }
+}
 //}}}
 
 #[derive(Debug, PartialEq)]
@@ -138,61 +160,40 @@ fn get_attr(attrs: &Ref<'_, Vec<Attribute>>, name: &str) -> Option<String> {
 }
 
 impl Selector {
-    fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
-        let mut id_match = true;
-        if let Some(el_id) = get_attr(&attrs, "id") {
-            let el_ids: Vec<_> = el_id.split_whitespace().collect();
-            id_match = self
-                .matchers
-                .first()
-                .unwrap()
-                .id
-                .iter()
-                .all(|id| el_ids.iter().any(|eid| eid == id))
-        }
+    fn find_nodes(&self, elements: Vec<Handle>) -> Vec<Handle> {
+        let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
 
-        let mut class_match = true;
-        if let Some(el_class) = get_attr(&attrs, "class") {
-            let el_classes: Vec<_> = el_class.split_whitespace().collect();
+        self.matchers.iter().fold(elements, |elements, matcher| {
+            let mut acc = vec![];
 
-            class_match = self
-                .matchers
-                .first()
-                .unwrap()
-                .class
-                .iter()
-                .all(|class| el_classes.iter().any(|eclass| eclass == class))
-        }
+            for el in elements.iter() {
+                match el.data {
+                    NodeData::Element {
+                        ref name,
+                        ref attrs,
+                        ..
+                    } if matcher.matches(name, attrs.borrow()) => {
+                        acc.push(Rc::clone(&el));
+                    }
+                    _ => acc.append(
+                        &mut self.find_nodes(el.children.borrow().iter().map(Rc::clone).collect()),
+                    ),
+                };
+            }
 
-        self.matchers
-            .first()
-            .unwrap()
-            .tag
-            .iter()
-            .any(|tag| &name.local.to_string() == tag)
-            && id_match
-            && class_match
+            acc
+        })
     }
 
     fn find(&self, elements: Ref<'_, Vec<Handle>>) -> Vec<Element> {
-        let mut res = vec![];
+        let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
 
-        for el in elements.iter() {
-            match el.data {
-                NodeData::Element {
-                    ref name,
-                    ref attrs,
-                    ..
-                } if self.matches(name, attrs.borrow()) => {
-                    res.push(Element {
-                        handle: Rc::clone(&el),
-                    });
-                }
-                _ => res.append(&mut self.find(el.children.borrow())),
-            };
-        }
-
-        res
+        self.find_nodes(elements)
+            .iter()
+            .map(|e| Element {
+                handle: Rc::clone(e),
+            })
+            .collect()
     }
 } //}}}
 
