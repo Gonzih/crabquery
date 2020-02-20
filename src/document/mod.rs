@@ -3,7 +3,7 @@ use html5ever::parse_document;
 use html5ever::tendril::TendrilSink;
 use html5ever::tree_builder::TreeBuilderOpts;
 use markup5ever::{Attribute, QualName};
-use markup5ever_rcdom::{Handle, Node, NodeData, RcDom};
+use markup5ever_rcdom::{Handle, NodeData, RcDom};
 use std::cell::Ref;
 use std::default::Default;
 use std::rc::Rc;
@@ -116,21 +116,14 @@ impl From<&str> for Matcher {
 #[derive(Debug, PartialEq)]
 struct Selector {
     //{{{
-    next: Option<Rc<Selector>>,
-    matcher: Matcher,
+    matchers: Vec<Matcher>,
 }
 
 impl From<&str> for Selector {
     fn from(input: &str) -> Self {
-        let mut selectors: Vec<_> = input
-            .split_whitespace()
-            .map(|s| Self {
-                matcher: Matcher::from(s),
-                next: None,
-            })
-            .collect();
+        let matchers: Vec<_> = input.split_whitespace().map(Matcher::from).collect();
 
-        selectors.pop().unwrap()
+        Selector { matchers }
     }
 }
 
@@ -139,7 +132,7 @@ fn get_attr(attrs: &Ref<'_, Vec<Attribute>>, name: &str) -> Option<String> {
         .iter()
         .filter(|attr| &attr.name.local == name)
         .take(1)
-        .map(|attr| attr.value.to_string().to_owned())
+        .map(|attr| attr.value.to_string())
         .collect::<Vec<_>>()
         .pop()
 }
@@ -150,7 +143,9 @@ impl Selector {
         if let Some(el_id) = get_attr(&attrs, "id") {
             let el_ids: Vec<_> = el_id.split_whitespace().collect();
             id_match = self
-                .matcher
+                .matchers
+                .first()
+                .unwrap()
                 .id
                 .iter()
                 .all(|id| el_ids.iter().any(|eid| eid == id))
@@ -161,13 +156,17 @@ impl Selector {
             let el_classes: Vec<_> = el_class.split_whitespace().collect();
 
             class_match = self
-                .matcher
+                .matchers
+                .first()
+                .unwrap()
                 .class
                 .iter()
                 .all(|class| el_classes.iter().any(|eclass| eclass == class))
         }
 
-        self.matcher
+        self.matchers
+            .first()
+            .unwrap()
             .tag
             .iter()
             .any(|tag| &name.local.to_string() == tag)
