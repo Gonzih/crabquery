@@ -339,6 +339,20 @@ impl Element {
             _ => None,
         }
     }
+
+    /// Get text
+    pub fn text(&self) -> Option<String> {
+        let mut res = "".to_string();
+        let children = self.handle.children.borrow();
+
+        for child in children.iter() {
+            if let NodeData::Text { ref contents } = child.data {
+                res.push_str(&contents.borrow().to_string()[..]);
+            }
+        }
+
+        Some(res)
+    }
 } //}}}
 
 #[cfg(test)]
@@ -638,6 +652,14 @@ mod tests {
         );
         let sel = doc.select("div > span > a[data-counter*=\"obo\"]");
         assert_eq!(sel.len(), 1);
+    }
+
+    #[test]
+    fn test_simple_text() {
+        let doc = Document::from("<span>text hi there</span>");
+        let sel = doc.select("span");
+        let el = sel.first().unwrap();
+        assert_eq!(el.text().unwrap(), "text hi there".to_string());
     }
 
     //}}}

@@ -16,6 +16,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
+name = "crabquery"
+version = "0.1.0"
+dependencies = [
+ "html5ever",
+ "markup5ever",
+ "markup5ever_rcdom",
+]
+
+[[package]]
 name = "futf"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -242,15 +251,6 @@ name = "redox_syscall"
 version = "0.1.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2439c63f3f6139d1b57529d16bc3b8bb855230c8efcc5d3a896c8bea7c3b1e84"
-
-[[package]]
-name = "rquery"
-version = "0.1.0"
-dependencies = [
- "html5ever",
- "markup5ever",
- "markup5ever_rcdom",
-]
 
 [[package]]
 name = "ryu"

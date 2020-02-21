@@ -1,12 +1,14 @@
-# RQuery
+# CrabQuery - like JQuery, but for Crabs
 
-Is a small and simple library to query HTML markup.
-Supports more complicated css selectors than other similar libraries.
+Small and simple library to query HTML markup for your web scraping needs.
+
+Based on servo libraries.
+Supports more complicated CSS selectors than other similar libraries.
 
 ## Examples
 
 ```rust
-use rquery::Document;
+use crabquery::Document;
 
 let doc = Document::from(
     "<div class='container'>
@@ -15,7 +17,8 @@ let doc = Document::from(
        </a>
      </div>",
 );
-let sel = doc.select("div.container > a.button.link");
+
+let sel = doc.select("div.container > a.button.link[id=\"linkmain\"]");
 let el = sel.first();
 
 assert_eq!(el.attr("id"), Some("linkmain".to_string()));
