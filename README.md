@@ -32,10 +32,10 @@ let doc = Document::from(
 let sel = doc.select("div.container > a.button.link[id=\"linkmain\"]");
 let el = sel.first().unwrap();
 
-assert_eq!(el.attr("id"), Some("linkmain".to_string()));
+assert_eq!(el.attr("id").unwrap(), "linkmain");
 
 let sel = doc.select("div > a > span");
 let el = sel.first().unwrap();
 
-assert_eq!(el.text(), Some("text hi there".to_string()));
+assert_eq!(el.text().unwrap(), "text hi there");
 ```
