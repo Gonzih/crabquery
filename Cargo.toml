@@ -7,7 +7,7 @@ description = "JQuery like HTML query library"
 homepage = "https://github.com/Gonzih/rquery"
 repository = "https://github.com/Gonzih/rquery"
 documentation = "https://docs.rs/crabquery"
-
+readme = "README.md"
 keywords = ["html", "dom", "css" ,"jquery", "scraper", "selector"]
 license = "MIT"
 license-file = "LICENSE"
