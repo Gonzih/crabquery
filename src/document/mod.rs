@@ -24,6 +24,7 @@ fn default_parse_opts() -> ParseOpts {
 }
 
 impl From<&str> for Document {
+    /// Create document from a string slice
     fn from(input: &str) -> Self {
         let doc = parse_document(RcDom::default(), default_parse_opts())
             .from_utf8()
@@ -35,13 +36,9 @@ impl From<&str> for Document {
 }
 
 impl From<String> for Document {
+    /// Create document from String
     fn from(input: String) -> Self {
-        let doc = parse_document(RcDom::default(), default_parse_opts())
-            .from_utf8()
-            .read_from(&mut input.as_bytes())
-            .expect("could not parse html input");
-
-        Self { doc }
+        Self::from(&input[..])
     }
 }
 
@@ -57,6 +54,7 @@ impl From<String> for Document {
 // }
 
 impl Document {
+    /// Select elements using given css selector
     pub fn select(&self, selector: &str) -> Vec<Element> {
         let sel = Selector::from(selector);
         sel.find(self.doc.document.children.borrow())
@@ -257,6 +255,7 @@ impl From<&Handle> for Element {
 }
 
 impl Element {
+    /// Get value of an attribue
     pub fn attr(&self, name: &str) -> Option<String> {
         match self.handle.data {
             NodeData::Element { ref attrs, .. } => get_attr(&attrs.borrow(), name),
@@ -264,6 +263,7 @@ impl Element {
         }
     }
 
+    /// Get tag value
     pub fn tag(&self) -> Option<String> {
         match self.handle.data {
             NodeData::Element { ref name, .. } => Some(name.local.to_string()),
