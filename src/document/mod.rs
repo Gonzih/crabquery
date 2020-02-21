@@ -1,3 +1,14 @@
+//! This module provides functionality for parsing and working with DomTree
+//!
+//! Supported selectors are:
+//! * tag based `span` or `a`
+//! * class based `.button`
+//! * id based `#mainbutton`
+//! * direct child `>`
+//! * attribute selectors `[href]`, `[href="specific-value"]`, `[href*="contains-str"]`,
+//! `[href^="begins-with"]`,, `[href$="ends-with"]`
+//! * all combinations of above like `div.container > form#feedback input.button`
+//!
 use html5ever::driver::ParseOpts;
 use html5ever::parse_document;
 use html5ever::tendril::TendrilSink;
@@ -45,6 +56,17 @@ impl From<String> for Document {
 
 impl Document {
     /// Select elements using given css selector
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<span>hi there</span>");
+    /// let sel = doc.select("span");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.text().unwrap(), "hi there");
+    /// ```
     pub fn select(&self, selector: &str) -> Vec<Element> {
         let sel = Selector::from(selector);
         sel.find(self.doc.document.children.borrow())
@@ -325,6 +347,20 @@ impl From<&Handle> for Element {
 
 impl Element {
     /// Get value of an attribue
+    ///
+    /// # Arguments
+    /// * `name` - attribute name
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<a class='link'>hi there</a>");
+    /// let sel = doc.select("a");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.attr("class").unwrap(), "link");
+    /// ```
     pub fn attr(&self, name: &str) -> Option<String> {
         match self.handle.data {
             NodeData::Element { ref attrs, .. } => get_attr(&attrs.borrow(), name),
@@ -333,6 +369,17 @@ impl Element {
     }
 
     /// Get tag value
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<a class='link'>hi there</a>");
+    /// let sel = doc.select("a");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.tag().unwrap(), "a");
+    /// ```
     pub fn tag(&self) -> Option<String> {
         match self.handle.data {
             NodeData::Element { ref name, .. } => Some(name.local.to_string()),
@@ -341,6 +388,17 @@ impl Element {
     }
 
     /// Get text
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<a class='link'>hi there</a>");
+    /// let sel = doc.select("a");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.text().unwrap(), "hi there");
+    /// ```
     pub fn text(&self) -> Option<String> {
         let mut res = "".to_string();
         let children = self.handle.children.borrow();
@@ -355,6 +413,17 @@ impl Element {
     }
 
     /// Get children elements
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<a class='link'><span>hi there</span></a>");
+    /// let sel = doc.select("a");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.children().first().unwrap().text().unwrap(), "hi there");
+    /// ```
     pub fn children(&self) -> Vec<Element> {
         self.handle
             .children
@@ -372,6 +441,17 @@ impl Element {
     }
 
     /// Get parent element
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<a class='link'><span>hi there</span></a>");
+    /// let sel = doc.select("span");
+    /// let el = sel.first().unwrap();
+    ///
+    /// assert_eq!(el.parent().unwrap().tag().unwrap(), "a");
+    /// ```
     pub fn parent(&self) -> Option<Element> {
         if let Some(parent) = self.handle.parent.take() {
             let wrapper = parent.upgrade().map(Element::from);
