@@ -75,6 +75,7 @@ impl Document {
 
 #[derive(Debug, PartialEq, Clone)]
 enum AttributeSpec {
+    //{{{
     /// Implementation of [attribute] selector
     Present,
     /// Implementation of [attribute="value"] selector
@@ -103,7 +104,7 @@ impl AttributeSpec {
             Contains(v) => other.contains(v),
         }
     }
-}
+} //}}}
 
 #[derive(Debug, PartialEq, Clone)]
 struct Matcher {
