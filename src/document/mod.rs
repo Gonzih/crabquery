@@ -353,6 +353,23 @@ impl Element {
 
         Some(res)
     }
+
+    /// Get children elements
+    pub fn children(&self) -> Vec<Element> {
+        self.handle
+            .children
+            .borrow()
+            .iter()
+            .filter(|n| {
+                if let NodeData::Element { .. } = n.data {
+                    true
+                } else {
+                    false
+                }
+            })
+            .map(Element::from)
+            .collect::<Vec<_>>()
+    }
 } //}}}
 
 #[cfg(test)]
@@ -660,6 +677,21 @@ mod tests {
         let sel = doc.select("span");
         let el = sel.first().unwrap();
         assert_eq!(el.text().unwrap(), "text hi there".to_string());
+    }
+
+    #[test]
+    fn test_el_children() {
+        let doc = Document::from(
+            "<div>
+            <span>one</span>
+            <span>two</span>
+            <span>three</span>
+            </div>",
+        );
+        let sel = doc.select("div");
+        let el = sel.first().unwrap();
+        assert_eq!(el.children().len(), 3);
+        assert_eq!(el.children().first().unwrap().text().unwrap(), "one");
     }
 
     //}}}
