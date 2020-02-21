@@ -69,6 +69,7 @@ struct Matcher {
     tag: Vec<String>,
     class: Vec<String>,
     id: Vec<String>,
+    direct_match: bool,
 }
 
 impl From<String> for Matcher {
@@ -83,6 +84,14 @@ impl From<&str> for Matcher {
         let mut buf = "".to_string();
 
         for c in input.chars() {
+            if c == '>' {
+                return Self {
+                    tag: vec![],
+                    class: vec![],
+                    id: vec![],
+                    direct_match: true,
+                };
+            }
             if c == '#' || c == '.' || c == '[' {
                 segments.push(buf);
                 buf = "".to_string();
@@ -95,6 +104,7 @@ impl From<&str> for Matcher {
             tag: vec![],
             class: vec![],
             id: vec![],
+            direct_match: false,
         };
 
         for segment in segments {
@@ -114,6 +124,8 @@ impl From<&str> for Matcher {
 
 impl Matcher {
     fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
+        println!("scanning {:?} and {:?} with {:?}", name, attrs, self);
+
         let mut id_match = true;
         if let Some(el_id) = get_attr(&attrs, "id") {
             let el_ids: Vec<_> = el_id.split_whitespace().collect();
@@ -160,59 +172,80 @@ fn get_attr(attrs: &Ref<'_, Vec<Attribute>>, name: &str) -> Option<String> {
 }
 
 impl Selector {
-    fn find_nodes(&self, matchers: Vec<Matcher>, elements: Vec<Handle>) -> Vec<Handle> {
-        let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
+    fn find_nodes(
+        &self,
+        matcher: &Matcher,
+        elements: Vec<Handle>,
+        direct_match: bool,
+    ) -> Vec<Handle> {
+        let mut acc = vec![];
 
-        matchers.iter().fold(elements, |elements, matcher| {
-            let mut acc = vec![];
-
-            for el in elements.iter() {
-                match el.data {
-                    NodeData::Element {
-                        ref name,
-                        ref attrs,
-                        ..
-                    } if matcher.matches(name, attrs.borrow()) => {
-                        acc.push(Rc::clone(&el));
-                    }
-                    _ => {
-                        acc.append(&mut self.find_nodes(
-                            matchers.clone(),
-                            el.children.borrow().iter().map(Rc::clone).collect(),
-                        ));
-                        acc.append(&mut self.find_nodes(
-                            matchers[1..].to_vec(),
-                            el.children.borrow().iter().map(Rc::clone).collect(),
-                        ));
-                    }
-                };
+        for el in elements.iter() {
+            if !direct_match {
+                let children: Vec<_> = el.children.borrow().iter().map(Rc::clone).collect();
+                acc.append(&mut self.find_nodes(matcher, children, false));
             }
 
-            println!(
-                "elemens at the ent of selection for {:?} \n {:?}",
-                matcher, acc
-            );
+            match el.data {
+                NodeData::Element {
+                    ref name,
+                    ref attrs,
+                    ..
+                } if matcher.matches(name, attrs.borrow()) => {
+                    acc.push(Rc::clone(&el));
+                }
+                _ => {}
+            };
+        }
 
-            acc
-        })
+        acc
     }
 
     fn find(&self, elements: Ref<'_, Vec<Handle>>) -> Vec<Element> {
-        let elements: Vec<_> = elements.iter().map(Rc::clone).collect();
-        println!("matchers: {:?}", self.matchers);
+        let mut elements: Vec<_> = elements.iter().map(Rc::clone).collect();
+        println!("matchers: {:?}", self.matchers.clone());
 
-        self.find_nodes(self.matchers.clone(), elements)
-            .iter()
-            .map(|e| Element {
-                handle: Rc::clone(e),
-            })
-            .collect()
+        let mut direct_match = false;
+
+        for matcher in &self.matchers {
+            if matcher.direct_match {
+                direct_match = true;
+                continue;
+            }
+            elements = self.find_nodes(matcher, elements, direct_match);
+            direct_match = false;
+
+            println!(
+                "for {:?} found {:#?}",
+                matcher,
+                elements
+                    .iter()
+                    .map(|e| Element::from(e).tag())
+                    .collect::<Vec<_>>()
+            );
+        }
+
+        elements.iter().map(Element::from).collect()
     }
 } //}}}
 
 pub struct Element {
     //{{{
     handle: Handle,
+}
+
+impl From<Handle> for Element {
+    fn from(e: Handle) -> Self {
+        Self::from(&e)
+    }
+}
+
+impl From<&Handle> for Element {
+    fn from(e: &Handle) -> Self {
+        Element {
+            handle: Rc::clone(e),
+        }
+    }
 }
 
 impl Element {
@@ -241,7 +274,7 @@ mod tests {
         assert!(true);
     }
 
-    // Matcher tests
+    // Matcher tests{{{
     #[test]
     fn test_matcher_tag() {
         let m = Matcher::from("a");
@@ -251,11 +284,11 @@ mod tests {
                 tag: vec!["a".to_string()],
                 class: vec![],
                 id: vec![],
+                direct_match: false,
             }
         );
     }
 
-    // Matcher tests
     #[test]
     fn test_matcher_complex() {
         let m = Matcher::from("a.link.another_class#idofel.klass");
@@ -269,9 +302,24 @@ mod tests {
                     "klass".to_string()
                 ],
                 id: vec!["idofel".to_string()],
+                direct_match: false,
             }
         );
     }
+
+    #[test]
+    fn test_matcher_direct_match() {
+        let m = Matcher::from(">");
+        assert_eq!(
+            m,
+            Matcher {
+                tag: vec![],
+                class: vec![],
+                id: vec![],
+                direct_match: true,
+            }
+        );
+    } //}}}
 
     // // Selector tests{{{
     // #[test]
@@ -298,7 +346,7 @@ mod tests {
     //     );
     // } //}}}
 
-    // Element tests{{{
+    // Element tests
     #[test]
     fn test_el_tag() {
         let doc = Document::from("<a class='link'>hi there</a>");
@@ -353,6 +401,11 @@ mod tests {
             "<div class='container'><a class='link button' id='linkmain'>hi there</a></div>",
         );
         let sel = doc.select("div.container a.button.link");
+        println!("found {:#?}", sel.len());
+        println!(
+            "found {:#?}",
+            sel.iter().map(|e| e.tag()).collect::<Vec<_>>()
+        );
         let el = sel.first().unwrap();
         assert_eq!(el.attr("id"), Some("linkmain".to_string()));
     }
@@ -366,5 +419,34 @@ mod tests {
         let el = sel.first().unwrap();
         assert_eq!(el.attr("id"), Some("linkmain".to_string()));
     }
-    //}}}
+
+    #[test]
+    fn test_el_double_nested_selection() {
+        let doc = Document::from(
+            "<div class='container'><span>text<a class='link button' id='linkmain'>hi there</a></span></div>",
+        );
+        let sel = doc.select("div.container a.button.link");
+        let el = sel.first().unwrap();
+        assert_eq!(el.attr("id"), Some("linkmain".to_string()));
+    }
+
+    #[test]
+    fn test_el_double_nested_direct_child_no_match() {
+        let doc = Document::from(
+            "<div class='container'><span>text<a class='link button' id='linkmain'>hi there</a></span></div>",
+        );
+        let sel = doc.select("div.container > a.button.link");
+        let el = sel.first();
+        assert!(el.is_none());
+    }
+
+    #[test]
+    fn test_el_double_nested_direct_child_match() {
+        let doc = Document::from(
+            "<div class='container'><a class='link button' id='linkmain'><span>text hi there</span></a></div>",
+        );
+        let sel = doc.select("div.container > a.button.link");
+        let el = sel.first();
+        assert!(el.is_some());
+    }
 }
