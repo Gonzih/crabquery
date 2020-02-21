@@ -1,7 +1,7 @@
 let
    pkgs = import <nixpkgs> {};
 in pkgs.stdenv.mkDerivation rec {
-  name = "vuln-scanner-dev";
+  name = "rquery";
   buildInputs = with pkgs; [
     stdenv
     glib
@@ -9,6 +9,5 @@ in pkgs.stdenv.mkDerivation rec {
     rustup
     cargo
     curl
-    postgresql_11
   ];
 }

@@ -21,3 +21,6 @@ test:
 .PHONY: shell
 shell:
 	nix-shell shell.nix
+
+rust-setup:
+	rustup default nightly
