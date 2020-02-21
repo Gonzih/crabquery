@@ -3,6 +3,16 @@ name = "rquery"
 version = "0.1.0"
 authors = ["Max Gonzih <gonzih@gmail.com>"]
 edition = "2018"
+description = "JQuery like HTML query library"
+homepage = "https://github.com/Gonzih/rquery"
+repository = "https://github.com/Gonzih/rquery"
+
+keywords = ["html", "dom", "jquery"]
+license = "MIT"
+license-file = "LICENSE"
+
+[badges]
+github = { repository = "https://github.com/Gonzih/rquery", branch = "master" }
 
 [dependencies]
 html5ever = "0.25.1"
