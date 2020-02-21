@@ -9,8 +9,12 @@ Supports more complicated css selectors than other similar libraries.
 use rquery::Document;
 
 let doc = Document::from(
-    "<div class='container'><a class='link button' id='linkmain'><span>text hi there</span></a></div>",
-    );
+    "<div class='container'>
+       <a class='link button' id='linkmain'>
+         <span>text hi there</span>
+       </a>
+     </div>",
+);
 let sel = doc.select("div.container > a.button.link");
 let el = sel.first();
 

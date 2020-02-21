@@ -450,7 +450,11 @@ mod tests {
     #[test]
     fn test_el_double_nested_direct_child_match() {
         let doc = Document::from(
-            "<div class='container'><a class='link button' id='linkmain'><span>text hi there</span></a></div>",
+            "<div class='container'>
+               <a class='link button' id='linkmain'>
+                 <span>text hi there</span>
+               </a>
+             </div>",
         );
         let sel = doc.select("div.container > a.button.link");
         let el = sel.first();
