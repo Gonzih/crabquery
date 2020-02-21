@@ -279,7 +279,6 @@ mod tests {
     #[test]
     fn test_document_from_str() {
         Document::from("<a>hi there</a>");
-        assert!(true);
     }
 
     // Matcher tests{{{
@@ -354,7 +353,7 @@ mod tests {
     //     );
     // } //}}}
 
-    // Element tests
+    // Element tests{{{
     #[test]
     fn test_el_tag() {
         let doc = Document::from("<a class='link'>hi there</a>");
@@ -456,5 +455,5 @@ mod tests {
         let sel = doc.select("div.container > a.button.link");
         let el = sel.first();
         assert!(el.is_some());
-    }
+    } //}}}
 }
