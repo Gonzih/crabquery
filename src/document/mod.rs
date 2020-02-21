@@ -43,17 +43,6 @@ impl From<String> for Document {
     }
 }
 
-// impl From<&[u8]> for Document {
-//     fn from(input: &[u8]) -> Self {
-//         let doc = parse_document(RcDom::default(), default_parse_opts())
-//             .from_utf8()
-//             .read_from(&mut input)
-//             .expect("could not parse html input");
-
-//             Document { doc }
-//     }
-// }
-
 impl Document {
     /// Select elements using given css selector
     pub fn select(&self, selector: &str) -> Vec<Element> {
@@ -355,11 +344,6 @@ impl Element {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_document_from_str() {
-        Document::from("<a>hi there</a>");
-    }
 
     // Matcher tests{{{
     #[test]
