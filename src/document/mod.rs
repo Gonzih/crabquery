@@ -124,8 +124,6 @@ impl From<&str> for Matcher {
 
 impl Matcher {
     fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
-        println!("scanning {:?} and {:?} with {:?}", name, attrs, self);
-
         let mut id_match = true;
         if let Some(el_id) = get_attr(&attrs, "id") {
             let el_ids: Vec<_> = el_id.split_whitespace().collect();
@@ -142,7 +140,15 @@ impl Matcher {
                 .all(|class| el_classes.iter().any(|eclass| eclass == class))
         }
 
-        self.tag.iter().any(|tag| &name.local.to_string() == tag) && id_match && class_match
+        let name = name.local.to_string();
+        println!(
+            "for {} matches {} && {} && {}",
+            &name,
+            self.tag.iter().any(|tag| &name == tag),
+            id_match,
+            class_match
+        );
+        self.tag.iter().any(|tag| &name == tag) && id_match && class_match
     }
 }
 //}}}
@@ -210,19 +216,21 @@ impl Selector {
         for matcher in &self.matchers {
             if matcher.direct_match {
                 direct_match = true;
+                elements = elements
+                    .iter()
+                    .map(|el| {
+                        el.children
+                            .borrow()
+                            .iter()
+                            .map(Rc::clone)
+                            .collect::<Vec<_>>()
+                    })
+                    .flatten()
+                    .collect();
                 continue;
             }
             elements = self.find_nodes(matcher, elements, direct_match);
             direct_match = false;
-
-            println!(
-                "for {:?} found {:#?}",
-                matcher,
-                elements
-                    .iter()
-                    .map(|e| Element::from(e).tag())
-                    .collect::<Vec<_>>()
-            );
         }
 
         elements.iter().map(Element::from).collect()
