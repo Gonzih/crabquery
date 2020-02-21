@@ -370,6 +370,18 @@ impl Element {
             .map(Element::from)
             .collect::<Vec<_>>()
     }
+
+    /// Get parent element
+    pub fn parent(&self) -> Option<Element> {
+        if let Some(parent) = self.handle.parent.take() {
+            let wrapper = parent.upgrade().map(Element::from);
+            self.handle.parent.set(Some(parent));
+
+            return wrapper;
+        }
+
+        None
+    }
 } //}}}
 
 #[cfg(test)]
@@ -692,6 +704,19 @@ mod tests {
         let el = sel.first().unwrap();
         assert_eq!(el.children().len(), 3);
         assert_eq!(el.children().first().unwrap().text().unwrap(), "one");
+    }
+
+    #[test]
+    fn test_el_parent() {
+        let doc = Document::from(
+            "<div>
+            <span>one</span>
+            </div>",
+        );
+        let sel = doc.select("span");
+        let el = sel.first().unwrap();
+        assert!(el.parent().is_some());
+        assert_eq!(el.parent().unwrap().tag().unwrap(), "div");
     }
 
     //}}}
