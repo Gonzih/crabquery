@@ -5,6 +5,7 @@ use html5ever::tree_builder::TreeBuilderOpts;
 use markup5ever::{Attribute, QualName};
 use markup5ever_rcdom::{Handle, NodeData, RcDom};
 use std::cell::Ref;
+use std::collections::HashMap;
 use std::default::Default;
 use std::rc::Rc;
 
@@ -62,11 +63,44 @@ impl Document {
 } //}}}
 
 #[derive(Debug, PartialEq, Clone)]
+enum AttributeSpec {
+    /// Implementation of [attribute] selector
+    Present,
+    /// Implementation of [attribute="value"] selector
+    Exact(String),
+    // Implementation of [attribute~="value"] selector
+    // ContainsWord(String, String),
+    // Implementation of [attribute|="value"] selector
+    // StartsWord(String, String),
+    /// Implementation of [attribute^="value"] selector
+    Starts(String),
+    /// Implementation of [attribute$="value"] selector
+    Ends(String),
+    /// Implementation of [attribute*="value"] selector
+    Contains(String),
+}
+
+impl AttributeSpec {
+    fn matches(&self, other: String) -> bool {
+        use AttributeSpec::*;
+
+        match self {
+            Present => true,
+            Exact(v) => &other == v,
+            Starts(v) => other.starts_with(v),
+            Ends(v) => other.ends_with(v),
+            Contains(v) => other.contains(v),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 struct Matcher {
     //{{{
     tag: Vec<String>,
     class: Vec<String>,
     id: Vec<String>,
+    attribute: HashMap<String, AttributeSpec>,
     direct_match: bool,
 }
 
@@ -82,18 +116,28 @@ impl From<&str> for Matcher {
         let mut buf = "".to_string();
 
         for c in input.chars() {
-            if c == '>' {
-                return Self {
-                    tag: vec![],
-                    class: vec![],
-                    id: vec![],
-                    direct_match: true,
-                };
-            }
-            if c == '#' || c == '.' || c == '[' {
-                segments.push(buf);
-                buf = "".to_string();
-            }
+            match c {
+                '>' => {
+                    return Self {
+                        tag: vec![],
+                        class: vec![],
+                        id: vec![],
+                        attribute: HashMap::new(),
+                        direct_match: true,
+                    };
+                }
+                '#' | '.' | '[' => {
+                    segments.push(buf);
+                    buf = "".to_string();
+                }
+                ']' => {
+                    segments.push(buf);
+                    buf = "".to_string();
+                    continue;
+                }
+                _ => {}
+            };
+
             buf.push(c);
         }
         segments.push(buf);
@@ -102,17 +146,17 @@ impl From<&str> for Matcher {
             tag: vec![],
             class: vec![],
             id: vec![],
+            attribute: HashMap::new(),
             direct_match: false,
         };
 
         for segment in segments {
-            if segment.len() > 0 {
-                match segment.chars().next() {
-                    Some('#') => res.id.push(segment[1..].to_string()),
-                    Some('.') => res.class.push(segment[1..].to_string()),
-                    None => {}
-                    _ => res.tag.push(segment),
-                }
+            match segment.chars().next() {
+                Some('#') => res.id.push(segment[1..].to_string()),
+                Some('.') => res.class.push(segment[1..].to_string()),
+                Some('[') => res.add_data_attribute(segment[1..].to_string()),
+                None => {}
+                _ => res.tag.push(segment),
             }
         }
 
@@ -121,6 +165,41 @@ impl From<&str> for Matcher {
 }
 
 impl Matcher {
+    fn add_data_attribute(&mut self, spec: String) {
+        use AttributeSpec::*;
+
+        let parts = spec.split('=').collect::<Vec<_>>();
+
+        if parts.len() == 1 {
+            let k = parts[0];
+            self.attribute.insert(k.to_string(), Present);
+            return;
+        }
+
+        let v = parts[1].trim_matches('"').to_string();
+        let k = parts[0];
+        let k = k[..k.len() - 1].to_string();
+
+        match parts[0].chars().last() {
+            Some('^') => {
+                self.attribute.insert(k, Starts(v));
+            }
+            Some('$') => {
+                self.attribute.insert(k, Ends(v));
+            }
+            Some('*') => {
+                self.attribute.insert(k, Contains(v));
+            }
+            Some(_) => {
+                let k = parts[0].to_string();
+                self.attribute.insert(k, Exact(v));
+            }
+            None => {
+                panic!("Colud not parse attribute spec \"{}\"", spec);
+            }
+        }
+    }
+
     fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
         let mut id_match = true;
         if let Some(el_id) = get_attr(&attrs, "id") {
@@ -138,15 +217,18 @@ impl Matcher {
                 .all(|class| el_classes.iter().any(|eclass| eclass == class))
         }
 
+        let mut attr_match = true;
+        for (k, v) in &self.attribute {
+            if let Some(value) = get_attr(&attrs, &k[..]) {
+                if !v.matches(value) {
+                    attr_match = false;
+                    break;
+                }
+            }
+        }
+
         let name = name.local.to_string();
-        println!(
-            "for {} matches {} && {} && {}",
-            &name,
-            self.tag.iter().any(|tag| &name == tag),
-            id_match,
-            class_match
-        );
-        self.tag.iter().any(|tag| &name == tag) && id_match && class_match
+        self.tag.iter().any(|tag| &name == tag) && id_match && class_match && attr_match
     }
 }
 //}}}
@@ -207,8 +289,6 @@ impl Selector {
 
     fn find(&self, elements: Ref<'_, Vec<Handle>>) -> Vec<Element> {
         let mut elements: Vec<_> = elements.iter().map(Rc::clone).collect();
-        println!("matchers: {:?}", self.matchers.clone());
-
         let mut direct_match = false;
 
         for matcher in &self.matchers {
@@ -285,48 +365,83 @@ mod tests {
     #[test]
     fn test_matcher_tag() {
         let m = Matcher::from("a");
-        assert_eq!(
-            m,
-            Matcher {
-                tag: vec!["a".to_string()],
-                class: vec![],
-                id: vec![],
-                direct_match: false,
-            }
-        );
+        assert_eq!(m.tag, vec!["a".to_string()],);
     }
 
     #[test]
     fn test_matcher_complex() {
         let m = Matcher::from("a.link.another_class#idofel.klass");
+        assert_eq!(m.tag, vec!["a".to_string()]);
         assert_eq!(
-            m,
-            Matcher {
-                tag: vec!["a".to_string()],
-                class: vec![
-                    "link".to_string(),
-                    "another_class".to_string(),
-                    "klass".to_string()
-                ],
-                id: vec!["idofel".to_string()],
-                direct_match: false,
-            }
+            m.class,
+            vec![
+                "link".to_string(),
+                "another_class".to_string(),
+                "klass".to_string()
+            ]
         );
+        assert_eq!(m.id, vec!["idofel".to_string()]);
     }
 
     #[test]
     fn test_matcher_direct_match() {
         let m = Matcher::from(">");
-        assert_eq!(
-            m,
-            Matcher {
-                tag: vec![],
-                class: vec![],
-                id: vec![],
-                direct_match: true,
-            }
+        assert_eq!(m.direct_match, true);
+    }
+
+    #[test]
+    fn test_matcher_data_attribute_present() {
+        let m = Matcher::from("a[target]");
+        let mut attr = HashMap::new();
+        attr.insert("target".to_string(), AttributeSpec::Present);
+        assert_eq!(m.attribute, attr);
+    }
+
+    #[test]
+    fn test_matcher_data_attribute_exact() {
+        let m = Matcher::from("a[target=\"_blank\"]");
+        let mut attr = HashMap::new();
+        attr.insert(
+            "target".to_string(),
+            AttributeSpec::Exact("_blank".to_string()),
         );
-    } //}}}
+        assert_eq!(m.attribute, attr);
+    }
+
+    #[test]
+    fn test_matcher_data_attribute_starts() {
+        let m = Matcher::from("a[target^=\"_blank\"]");
+        let mut attr = HashMap::new();
+        attr.insert(
+            "target".to_string(),
+            AttributeSpec::Starts("_blank".to_string()),
+        );
+        assert_eq!(m.attribute, attr);
+    }
+
+    #[test]
+    fn test_matcher_data_attribute_ends() {
+        let m = Matcher::from("a[target$=\"_blank\"]");
+        let mut attr = HashMap::new();
+        attr.insert(
+            "target".to_string(),
+            AttributeSpec::Ends("_blank".to_string()),
+        );
+        assert_eq!(m.attribute, attr);
+    }
+
+    #[test]
+    fn test_matcher_data_attribute_contains() {
+        let m = Matcher::from("a[target*=\"_blank\"]");
+        let mut attr = HashMap::new();
+        attr.insert(
+            "target".to_string(),
+            AttributeSpec::Contains("_blank".to_string()),
+        );
+        assert_eq!(m.attribute, attr);
+    }
+
+    //}}}
 
     // // Selector tests{{{
     // #[test]
@@ -408,11 +523,6 @@ mod tests {
             "<div class='container'><a class='link button' id='linkmain'>hi there</a></div>",
         );
         let sel = doc.select("div.container a.button.link");
-        println!("found {:#?}", sel.len());
-        println!(
-            "found {:#?}",
-            sel.iter().map(|e| e.tag()).collect::<Vec<_>>()
-        );
         let el = sel.first().unwrap();
         assert_eq!(el.attr("id"), Some("linkmain".to_string()));
     }
@@ -459,5 +569,92 @@ mod tests {
         let sel = doc.select("div.container > a.button.link");
         let el = sel.first();
         assert!(el.is_some());
-    } //}}}
+    }
+
+    #[test]
+    fn test_simple_multiple_a() {
+        let doc = Document::from(
+            "<div class='container'>
+               <a class='link button' id='linkmain'>
+                 <span>text hi there</span>
+               </a>
+               <span>text hi there <a href='blob'>two</a></span>
+             </div>",
+        );
+        let sel = doc.select("a");
+        assert_eq!(sel.len(), 2);
+    }
+
+    #[test]
+    fn test_simple_multiple_a_in_div() {
+        let doc = Document::from(
+            "<div class='container'>
+               <a class='link button' id='linkmain'>
+                 <span>text hi there</span>
+               </a>
+             </div>
+             <div>
+               <span>text hi there
+                 <a class='blob'>two</a>
+               </span>
+             </div>
+             ",
+        );
+        let sel = doc.select("div a");
+        assert_eq!(sel.len(), 2);
+    }
+
+    #[test]
+    fn test_simple_attribute_present() {
+        let doc = Document::from(
+            "<div>
+               <span>text hi there
+                 <a data-counter='blob'>two</a>
+               </span>
+             </div>",
+        );
+        let sel = doc.select("div > span > a[data-counter]");
+        assert_eq!(sel.len(), 1);
+    }
+
+    #[test]
+    fn test_simple_attribute_starts() {
+        let doc = Document::from(
+            "<div>
+               <span>text hi there
+                 <a data-counter='blobovo'>two</a>
+               </span>
+             </div>",
+        );
+        let sel = doc.select("div > span > a[data-counter^=\"blob\"]");
+        assert_eq!(sel.len(), 1);
+    }
+
+    #[test]
+    fn test_simple_attribute_ends() {
+        let doc = Document::from(
+            "<div>
+               <span>text hi there
+                 <a data-counter='blobovo'>two</a>
+               </span>
+             </div>",
+        );
+        let sel = doc.select("div > span > a[data-counter$=\"ovo\"]");
+        assert_eq!(sel.len(), 1);
+    }
+
+    #[test]
+    fn test_simple_attribute_contains() {
+        let doc = Document::from(
+            "<div>
+               <span>text hi there
+                 <a data-counter='blobovo'>two</a>
+               </span>
+             </div>",
+        );
+        let sel = doc.select("div > span > a[data-counter*=\"obo\"]");
+        assert_eq!(sel.len(), 1);
+    }
+
+    //}}}
 }
