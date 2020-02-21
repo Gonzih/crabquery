@@ -8,7 +8,7 @@ homepage = "https://github.com/Gonzih/rquery"
 repository = "https://github.com/Gonzih/rquery"
 documentation = "https://docs.rs/crabquery"
 readme = "README.md"
-keywords = ["html", "dom", "css" ,"jquery", "scraper", "selector"]
+keywords = ["html", "dom", "css" ,"jquery", "scraper"]
 license = "MIT"
 license-file = "LICENSE"
 
