@@ -2,14 +2,17 @@
 
 [![CI][ci-badge]][ci-url]
 [![Crates.io][crates-badge]][crates-url]
+[![docs.rs][docs-badge]][docs-url]
 [![MIT licensed][mit-badge]][mit-url]
 
-[crates-badge]: https://img.shields.io/crates/v/crabquery.svg
-[crates-url]: https://crates.io/crates/crabquery
-[mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
-[mit-url]: LICENSE
 [ci-badge]: https://github.com/Gonzih/crabquery/workflows/CI/badge.svg
 [ci-url]: https://github.com/Gonzih/crabquery/actions
+[crates-badge]: https://img.shields.io/crates/v/crabquery.svg
+[crates-url]: https://crates.io/crates/crabquery
+[docs-badge]: https://docs.rs/crabler/badge.svg
+[docs-url]: https://docs.rs/crabler
+[mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[mit-url]: LICENSE
 
 Small and simple library to query HTML markup for your web scraping needs.
 

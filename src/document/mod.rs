@@ -308,14 +308,13 @@ impl Selector {
                 direct_match = true;
                 elements = elements
                     .iter()
-                    .map(|el| {
+                    .flat_map(|el| {
                         el.children
                             .borrow()
                             .iter()
                             .map(Rc::clone)
                             .collect::<Vec<_>>()
                     })
-                    .flatten()
                     .collect();
                 continue;
             }
