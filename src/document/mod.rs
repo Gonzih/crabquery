@@ -463,6 +463,25 @@ impl Element {
 
         None
     }
+
+    /// Select child elements using given css selector
+    ///
+    /// # Example
+    /// ```
+    /// use crabquery::Document;
+    ///
+    /// let doc = Document::from("<span><a class='link'>hi there</a></span>");
+    /// let sel = doc.select("span");
+    /// let el = sel.first().unwrap();
+    /// let sel = el.select("a");
+    /// let a = sel.first().unwrap();
+    ///
+    /// assert_eq!(a.attr("class").unwrap(), "link");
+    /// ```
+    pub fn select(&self, selector: &str) -> Vec<Element> {
+        let sel = Selector::from(selector);
+        sel.find(self.handle.children.borrow())
+    }
 } //}}}
 
 #[cfg(test)]
