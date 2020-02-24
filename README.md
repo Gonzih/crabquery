@@ -9,8 +9,8 @@
 [ci-url]: https://github.com/Gonzih/crabquery/actions
 [crates-badge]: https://img.shields.io/crates/v/crabquery.svg
 [crates-url]: https://crates.io/crates/crabquery
-[docs-badge]: https://docs.rs/crabler/badge.svg
-[docs-url]: https://docs.rs/crabler
+[docs-badge]: https://docs.rs/crabquery/badge.svg
+[docs-url]: https://docs.rs/crabquery
 [mit-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [mit-url]: LICENSE
 
