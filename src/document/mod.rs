@@ -50,7 +50,7 @@ impl From<&str> for Document {
 impl From<String> for Document {
     /// Create document from String
     fn from(input: String) -> Self {
-        Self::from(&input[..])
+        Self::from(input.as_str())
     }
 }
 
@@ -118,7 +118,7 @@ struct Matcher {
 
 impl From<String> for Matcher {
     fn from(input: String) -> Self {
-        Self::from(&input[..])
+        Self::from(input.as_str())
     }
 }
 
@@ -231,7 +231,7 @@ impl Matcher {
 
         let mut attr_match = true;
         for (k, v) in &self.attribute {
-            if let Some(value) = get_attr(&attrs, &k[..]) {
+            if let Some(value) = get_attr(&attrs, k.as_str()) {
                 if !v.matches(value) {
                     attr_match = false;
                     break;
@@ -405,7 +405,7 @@ impl Element {
 
         for child in children.iter() {
             if let NodeData::Text { ref contents } = child.data {
-                res.push_str(&contents.borrow().to_string()[..]);
+                res.push_str(&contents.borrow().to_string().as_str());
             }
         }
 
