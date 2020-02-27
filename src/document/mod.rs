@@ -14,15 +14,15 @@ use html5ever::parse_document;
 use html5ever::tendril::TendrilSink;
 use html5ever::tree_builder::TreeBuilderOpts;
 use markup5ever::{Attribute, QualName};
-use markup5ever_rcdom::{Handle, NodeData, RcDom};
+use markup5ever_arcdom::{ArcDom, Handle, NodeData};
 use std::cell::Ref;
 use std::collections::HashMap;
 use std::default::Default;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct Document {
     //{{{
-    doc: RcDom,
+    doc: ArcDom,
 }
 
 fn default_parse_opts() -> ParseOpts {
@@ -38,7 +38,7 @@ fn default_parse_opts() -> ParseOpts {
 impl From<&str> for Document {
     /// Create document from a string slice
     fn from(input: &str) -> Self {
-        let doc = parse_document(RcDom::default(), default_parse_opts())
+        let doc = parse_document(ArcDom::default(), default_parse_opts())
             .from_utf8()
             .read_from(&mut input.as_bytes())
             .expect("could not parse html input");
@@ -280,7 +280,7 @@ impl Selector {
 
         for el in elements.iter() {
             if !direct_match {
-                let children: Vec<_> = el.children.borrow().iter().map(Rc::clone).collect();
+                let children: Vec<_> = el.children.borrow().iter().map(Arc::clone).collect();
                 acc.append(&mut self.find_nodes(matcher, children, false));
             }
 
@@ -290,7 +290,7 @@ impl Selector {
                     ref attrs,
                     ..
                 } if matcher.matches(name, attrs.borrow()) => {
-                    acc.push(Rc::clone(&el));
+                    acc.push(Arc::clone(&el));
                 }
                 _ => {}
             };
@@ -300,7 +300,7 @@ impl Selector {
     }
 
     fn find(&self, elements: Ref<'_, Vec<Handle>>) -> Vec<Element> {
-        let mut elements: Vec<_> = elements.iter().map(Rc::clone).collect();
+        let mut elements: Vec<_> = elements.iter().map(Arc::clone).collect();
         let mut direct_match = false;
 
         for matcher in &self.matchers {
@@ -312,7 +312,7 @@ impl Selector {
                         el.children
                             .borrow()
                             .iter()
-                            .map(Rc::clone)
+                            .map(Arc::clone)
                             .collect::<Vec<_>>()
                     })
                     .collect();
@@ -340,7 +340,7 @@ impl From<Handle> for Element {
 impl From<&Handle> for Element {
     fn from(e: &Handle) -> Self {
         Element {
-            handle: Rc::clone(e),
+            handle: Arc::clone(e),
         }
     }
 }
