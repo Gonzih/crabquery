@@ -240,7 +240,9 @@ impl Matcher {
         }
 
         let name = name.local.to_string();
-        self.tag.iter().any(|tag| &name == tag) && id_match && class_match && attr_match
+        let tag_match = self.tag.is_empty() || self.tag.iter().any(|tag| &name == tag);
+
+        tag_match && id_match && class_match && attr_match
     }
 }
 //}}}
