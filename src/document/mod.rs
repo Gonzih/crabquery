@@ -213,13 +213,13 @@ impl Matcher {
     }
 
     fn matches(&self, name: &QualName, attrs: Ref<'_, Vec<Attribute>>) -> bool {
-        let mut id_match = true;
+        let mut id_match = self.id.is_empty();
         if let Some(el_id) = get_attr(&attrs, "id") {
             let el_ids: Vec<_> = el_id.split_whitespace().collect();
             id_match = self.id.iter().all(|id| el_ids.iter().any(|eid| eid == id))
         }
 
-        let mut class_match = true;
+        let mut class_match = self.class.is_empty();
         if let Some(el_class) = get_attr(&attrs, "class") {
             let el_classes: Vec<_> = el_class.split_whitespace().collect();
 

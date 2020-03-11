@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="docs.rs 0.6.0 (be4a0c1 2020-03-04)">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/normalize-20200303-1.43.0-nightly-4ad624882.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/rustdoc-20200303-1.43.0-nightly-4ad624882.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/light-20200303-1.43.0-nightly-4ad624882.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="/style.css?0.6.0-be4a0c1-2020-03-04" type="text/css" media="all" />
+    <link rel="search" href="/opensearch.xml" type="application/opensearchdescription+xml" title="Docs.rs">
+    
+    
+    <title>Docs.rs</title>
+  </head>
+  <body>
+
+      <div class="nav-container">
+      <div class="container">
+        <div class="pure-menu pure-menu-horizontal" role="navigation" aria-label="Main navigation">
+          <form action="/releases/search" method="GET" class="landing-search-form-nav">
+            
+          <a href="/" class="pure-menu-heading pure-menu-link" aria-label="Docs.rs"><i class="fa fa-cubes fa-fw"></i> Docs.rs</a>
+          <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="/releases" class="pure-menu-link">Releases</a></li>
+            <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+              <a href="#" class="pure-menu-link">Rust</a>
+              <ul class="pure-menu-children">
+                <li class="pure-menu-item"><a href="https://www.rust-lang.org/" target="_blank" class="pure-menu-link">The Rust Programming Language</a></li>
+                <li class="pure-menu-item"><a href="https://doc.rust-lang.org/book/" target="_blank" class="pure-menu-link">The Book</a></li>
+                <li class="pure-menu-item"><a href="https://doc.rust-lang.org/std/" target="_blank" class="pure-menu-link">Standard Library API Reference</a></li>
+                <li class="pure-menu-item menu-item-divided"><a href="https://doc.rust-lang.org/rust-by-example/" target="_blank" class="pure-menu-link">Rust by Example</a></li>
+
+                <li class="pure-menu-item"><a href="https://crates.io" target="_blank" class="pure-menu-link">Crates.io</a></li>
+                <li class="pure-menu-item menu-item-divided"><a href="http://doc.crates.io/guide.html" target="_blank" class="pure-menu-link">The Cargo Guide</a></li>
+                <li class="pure-menu-item"><a href="/about" class="pure-menu-link">About Docs.rs</a></li>
+              </ul>
+            </li>
+            
+
+
+          </ul>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    
+
+
+
+<script type="text/javascript" charset="utf-8">
+  function getKey(ev) {
+    if ("key" in ev && typeof ev.key != "undefined") {
+       return ev.key;
+    }
+    return String.fromCharCode(ev.charCode || ev.keyCode);
+  }
+</script>
+
+
+<div class="container landing">
+  <h1 class="brand"><i class="fa fa-cubes fa-fw"></i> Docs.rs</h1>
+
+  <form action="/releases/search" method="GET" class="landing-search-form">
+    <div><input class="search-input" id="search" name="query" type="text" aria-label="Find crate by search query" placeholder="Click or press 'S' to search" autofocus></div>
+    <div class="buttons">
+      <button type="submit" class="pure-button pure-button-normal">Search</button>
+      <button type="submit" class="pure-button pure-button-normal" id="i-am-feeling-lucky-button">I'm Feeling Lucky</button>
+    </div>
+  </form>
+  <script type="text/javascript" charset="utf-8">
+    document.getElementById("i-am-feeling-lucky-button").onclick = function() {
+      var form = document.getElementsByClassName("landing-search-form");
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'i-am-feeling-lucky';
+      input.value = 1;
+      document.getElementsByClassName("landing-search-form")[0].appendChild(input);
+      return true;
+    };
+    function handleShortcut(ev) {
+      if (ev.ctrlKey || ev.altKey || ev.metaKey || document.activeElement.tagName === "INPUT") {
+        return;
+      }
+      switch (getKey(ev)) {
+        case "s":
+        case "S":
+          ev.preventDefault();
+          document.getElementById("search").focus();
+          break;
+      }
+    }
+    document.onkeypress = handleShortcut;
+    document.onkeydown = handleShortcut;
+  </script>
+</div>
+
+
+<div class="container">
+  <div class="recent-releases-container">
+    
+    <div class="release">
+      <a href="/releases"><strong>Recent Releases</strong></a> <a href="/releases/feed" title="Atom feed"><i class="fa fa-rss-square"></i></a>
+    </div>
+    
+
+    <ul>
+    
+    <li>
+    <a href="/crate/perftacho/0.4.2" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">perftacho-0.4.2</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Tool for measuring performance of binaries</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">6 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/sysinfo/0.11.7/sysinfo/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">sysinfo-0.11.7</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Library to get system information such as processes, processors, disks, components and networks</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">8 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/emacs-rs-module/0.13.0/emacs_rs_module/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">emacs-rs-module-0.13.0</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">An Emacs dynamic module that helps developing other dynamic modules, in Rust</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">10 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/emacs/0.13.0/emacs/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">emacs-0.13.0</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Rust library for creating Emacs's dynamic modules</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">11 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/emacs-macros/0.13.0/emacs_macros/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">emacs-macros-0.13.0</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Proc macros for emacs modules</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">12 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/leg/0.4.1/leg/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">leg-0.4.1</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">🔈 Elegant logging for CLIs made simple</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">19 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/activitystreams/0.4.0-alpha.2/activitystreams/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">activitystreams-0.4.0-alpha.2</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Activity Streams in Rust</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">33 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/activitypub/0.4.0/activitypub/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">activitypub-0.4.0</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">ActivityPub in Rust</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">35 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/crate/shunkakinoki/4.19.11" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">shunkakinoki-4.19.11</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">shunkakinoki</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">39 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/dtn7/0.8.4/dtn7/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">dtn7-0.8.4</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Rust delay-tolerant-networking daemon and CLI tools based upon bp7 (dtn version 7 draft)</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">42 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/c2rust-bitfields-derive/0.2.1/c2rust_bitfields_derive/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">c2rust-bitfields-derive-0.2.1</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">C-compatible struct bitfield derive implementation used in the C2Rust project</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">44 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/crate/perftacho/0.4.1" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">perftacho-0.4.1</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Tool for measuring performance of binaries</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">45 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/cmdex/0.2.5/cmdex/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">cmdex-0.2.5</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">Search for those commands you don't remember!
+</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">47 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/crate/shunkakinoki/4.19.10" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">shunkakinoki-4.19.10</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">shunkakinoki</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">48 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    <li>
+    <a href="/leg/0.4.0/leg/" class="release">
+      <div class="pure-g">
+        <div class="pure-u-1 pure-u-sm-6-24 pure-u-md-5-24 name">leg-0.4.0</div>
+        <div class="pure-u-1 pure-u-sm-14-24 pure-u-md-16-24 description">🔈 Elegant logging for CLIs made simple</div>
+        
+        <div class="pure-u-1 pure-u-sm-4-24 pure-u-md-3-24 date">53 minutes ago</div>
+        
+      </div>
+    </a>
+    </li>
+    
+    </ul>
+    
+  </div>
+</div>
+
+
+<script type="text/javascript" src="/menu.js?0.6.0-be4a0c1-2020-03-04"></script>
+<script type="text/javascript" src="/index.js?0.6.0-be4a0c1-2020-03-04"></script>
+</body>
+</html>
+
