@@ -820,5 +820,17 @@ mod tests {
         assert_eq!(el.parent().unwrap().tag().unwrap(), "div");
     }
 
+    #[test]
+    fn test_attribute_selection_multiple_els() {
+        let doc = Document::from(
+            "<head>
+            <meta property='og:title' content='content'/>
+            <meta content='content'/>
+            </head>",
+        );
+        let sel = doc.select("meta[property=\"og:title\"]");
+        assert_eq!(sel.len(), 1);
+    }
+
     //}}}
 }
