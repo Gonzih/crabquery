@@ -236,11 +236,19 @@ impl Matcher {
                     attr_match = false;
                     break;
                 }
+            } else {
+                attr_match = false;
+                break;
             }
         }
 
         let name = name.local.to_string();
         let tag_match = self.tag.is_empty() || self.tag.iter().any(|tag| &name == tag);
+        // println!(
+        //     "for: {:?} \n {:?} \n {:?} \n tag_match: {}, id_match: {}, class_match: {}, attr_match: {} \n",
+        //     &self, name, attrs,
+        //     tag_match, id_match, class_match, attr_match
+        // );
 
         tag_match && id_match && class_match && attr_match
     }
