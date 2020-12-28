@@ -1,6 +1,6 @@
 [package]
 name = "crabquery"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Max Gonzih <gonzih@gmail.com>"]
 edition = "2018"
 description = "JQuery like HTML query library"
