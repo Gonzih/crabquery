@@ -14,4 +14,10 @@ fn test_docs_rs_index() {
 
     let els = document.select("meta[name=\"generator\"]");
     assert_eq!(els.len(), 1);
+
+    let els = document.select("a");
+    assert!(els.len() > 20);
+
+    let els = document.select("a[href]");
+    assert!(els.len() > 20);
 }
