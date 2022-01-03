@@ -23,7 +23,8 @@ shell:
 	nix-shell shell.nix
 
 rust-setup:
-	rustup default nightly
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+	rustup default stable
 
 publish:
 	cargo publish

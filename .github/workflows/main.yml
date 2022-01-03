@@ -5,9 +5,6 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: nixos/nix
     steps:
-    - uses: actions/checkout@v2
-    - name: CI
-      run: nix-shell shell.nix --run 'make rust-setup test'
+      - uses: actions/checkout@v2
+      - run: make rust-setup test
