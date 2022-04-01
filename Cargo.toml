@@ -10,12 +10,11 @@ documentation = "https://docs.rs/crabquery"
 readme = "README.md"
 keywords = ["html", "dom", "css" ,"jquery", "scraper"]
 license = "MIT"
-license-file = "LICENSE"
 
 [badges]
 # github = { repository = "https://github.com/Gonzih/rquery", branch = "master" }
 
 [dependencies]
-html5ever = "0.25.1"
-markup5ever = "0.10.1"
-markup5ever_arcdom = "0.1.1"
+html5ever = "0.26"
+markup5ever = "0.11"
+markup5ever_arcdom = "0.1"
