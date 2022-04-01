@@ -16,6 +16,6 @@ license-file = "LICENSE"
 # github = { repository = "https://github.com/Gonzih/rquery", branch = "master" }
 
 [dependencies]
-html5ever = "0.25.1"
+html5ever = "0.26.0"
 markup5ever = "0.10.1"
 markup5ever_arcdom = "0.1.1"
