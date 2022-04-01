@@ -18,4 +18,4 @@ license-file = "LICENSE"
 [dependencies]
 html5ever = "0.25.1"
 markup5ever = "0.10.1"
-markup5ever_arcdom = "0.1.1"
+markup5ever_arcdom = "0.1.2"
