@@ -2,7 +2,7 @@
 name = "crabquery"
 version = "0.1.9"
 authors = ["Max Gonzih <gonzih@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "JQuery like HTML query library"
 homepage = "https://github.com/Gonzih/crabquery"
 repository = "https://github.com/Gonzih/crabquery"
