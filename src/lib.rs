@@ -10,6 +10,7 @@
 //! * all combinations of above like `div.container > form#feedback input.button`
 #![crate_name = "crabquery"]
 
+mod arcdom;
 mod document;
 
 pub use document::*;

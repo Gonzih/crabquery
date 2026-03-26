@@ -14,7 +14,7 @@ use html5ever::parse_document;
 use html5ever::tendril::TendrilSink;
 use html5ever::tree_builder::TreeBuilderOpts;
 use markup5ever::{Attribute, QualName};
-use markup5ever_arcdom::{ArcDom, Handle, NodeData};
+use crate::arcdom::{ArcDom, Handle, NodeData};
 use std::cell::Ref;
 use std::collections::HashMap;
 use std::default::Default;
