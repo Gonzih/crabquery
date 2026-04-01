@@ -15,5 +15,5 @@ license = "MIT"
 # github = { repository = "https://github.com/Gonzih/rquery", branch = "master" }
 
 [dependencies]
-html5ever = "0.27"
+html5ever = "0.39"
 markup5ever = "0.12.1"
