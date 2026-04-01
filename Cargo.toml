@@ -16,4 +16,4 @@ license = "MIT"
 
 [dependencies]
 html5ever = "0.27"
-markup5ever = "0.12.1"
+markup5ever = "0.39.0"
